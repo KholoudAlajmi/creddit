@@ -4,7 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import MainNavigation from './src/navigations/MainNavigation';
 import PostDetailsScreen from './src/screens/PostDetailsScreen';
-import AddCommentsScreen from './src/screens/AddCommentsScreen';
+//import AddCommentsScreen from './src/screens/AddCommentsScreen';
 import AddPostsScreen from './src/screens/AddPostsScreen';
 import { createStackNavigator } from '@react-navigation/stack';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -20,7 +20,7 @@ export default function App() {
       <Stack.Navigator>
         <Stack.Screen name="MainNavigation" component={MainNavigation} options={{ headerShown: false }} />
         <Stack.Screen name="PostDetailsScreen" component={PostDetailsScreen} options={{ headerShown: false }}  />
-        <Stack.Screen name="AddCommentsScreen" component={AddCommentsScreen} options={{ headerShown: false }} />
+        {/* <Stack.Screen name="AddCommentsScreen" component={AddCommentsScreen} options={{ headerShown: false }} /> */}
         <Stack.Screen name="AddPostsScreen" component={AddPostsScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>

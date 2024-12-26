@@ -46,10 +46,9 @@ const HomeScreen = () => {
    
 
           <Button
-            title="Add Comment"
-            color="black"
+            title="Add Post"
             onPress={() => {
-              navigation.navigate("AddCommentsScreen");
+              navigation.navigate("AddPostsScreen");
             }}
           />
         </View>

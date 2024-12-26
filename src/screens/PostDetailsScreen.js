@@ -3,10 +3,13 @@ import { useQuery } from "@tanstack/react-query";
 import { getCredditById } from "../api/creddit";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useMutation } from "@tanstack/react-query";
-import { deleteCreddit , deleteComment} from "../api/creddit";
+import { deleteCreddit, deleteComment, createComment } from "../api/creddit";
 import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { useNavigation } from "@react-navigation/native";
 
 const PostDetailsScreen = ({ route }) => {
+  const navigation = useNavigation();
   const queryClient = useQueryClient();
 
   const postId = route?.params?.id;
@@ -34,22 +37,35 @@ const PostDetailsScreen = ({ route }) => {
   });
 
   const handleDeleteComment = (comment) => {
-    console.log("comment", comment);
-    deleteCommentMutation.mutate(comment.id );
+    deleteCommentMutation.mutate(comment.id);
   };
 
+  const [commentData, setCommentData] = useState({
+    username: "",
+    comment: "",
+  });
+
+  const createCommentMutation = useMutation({
+    mutationFn: (data) => createComment(postId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["posts", postId] });
+    },
+  });
+
+  const handleSubmit = () => {
+    createCommentMutation.mutate(commentData);
+  };
 
   const CommentList = data?.comments.map((comment) => (
     <View key={comment.id} style={styles.commentContainer}>
       <Text style={styles.description}>Comment: {comment.comment}</Text>
-
-      <Button 
+      <Button
         title="Delete Comment"
         type="clear"
         onPress={() => handleDeleteComment(comment)}
       />
     </View>
-  ))
+  ));
   return (
     <SafeAreaProvider style={styles.background}>
       <View style={styles.container}>
@@ -58,19 +74,45 @@ const PostDetailsScreen = ({ route }) => {
           <Text style={styles.text}> {data?.title}</Text>
 
           <View style={styles.description}>
-          <Text style={styles.descriptionFont}>ID: {data?.id}</Text>
-          <Text style={styles.descriptionFont}>Description: {data?.description}</Text>
+            <Text style={styles.descriptionFont}>ID: {data?.id}</Text>
+            <Text style={styles.descriptionFont}>
+              Description: {data?.description}
+            </Text>
           </View>
 
           {CommentList}
-</View>
-     
-          <Button
-            title="Delete Post"
-            type="clear"
-            onPress={() => handleDelete(data)}
+          <TextInput
+            style={styles.input}
+            placeholder="Username Here"
+            value={commentData.username}
+            onChangeText={(text) =>
+              setCommentData({ ...commentData, username: text })
+            }
           />
-       </View>  
+          <TextInput
+            style={styles.input}
+            placeholder="Comment Here"
+            value={commentData.comment}
+            onChangeText={(text) =>
+              setCommentData({ ...commentData, comment: text })
+            }
+          />
+
+          <Button
+            title="Add Comment"
+            onPress={handleSubmit}
+            disabled={createCommentMutation.isLoading}
+          />
+        </View>
+
+        <Button
+          title="Delete Post"
+          type="clear"
+          onPress={() => {
+            handleDelete(data?.id);
+          }}
+        />
+      </View>
     </SafeAreaProvider>
   );
 };
@@ -129,7 +171,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 30,
-  
   },
   title: {
     fontSize: 30,
@@ -145,7 +186,7 @@ const styles = StyleSheet.create({
     backgroundColor: "lightgray",
     borderRadius: 10,
     width: 300,
-    height: 510,
+    height: 480,
     marginTop: 20,
   },
   description: {
@@ -165,5 +206,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontSize: 5,
   },
-
+  input: {
+    width: "100%",
+    height: 40,
+    backgroundColor: "white",
+    alignItems: "center",
+  },
 });
